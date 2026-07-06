@@ -1,0 +1,160 @@
+[CXC.FRM/Forma.ListaAcciones]
+Infomacion=EnviarMail
+EnviarMail=InfoCtaDinero
+Sucursal=Afectar2
+Afectar=(Fin)
+Fiscal=Afectar
+Afectar2=Consecutivo
+
+[CXC.FRM/Acciones.EnviarMail]
+Nombre=EnviarMail
+Boton=84
+Menu=&Edición
+UsaTeclaRapida=S
+TeclaRapida=Ctrl+M
+NombreDesplegar=Envio de Correo
+EnMenu=S
+TipoAccion=Expresion
+EnBarraHerramientas=S
+Expresion=Si Cxc:Cxc.CFDTimbrado = true<BR>Entonces<BR>   Si SQL(<T>spMovReporteIntelisis :tEmpresa, :tModulo, :tMov, :nID, :nAfectar<T>, Empresa, <T>CXC<T>, <T><T>, Cxc:Cxc.ID, 0)<BR>   Entonces<BR>      Asigna(Info.Reporte, SQL(<T>spMovFormatoIntelisis :tEmpresa, :tModulo, :tMov, :nID<T>, Empresa, <T>CXC<T>, <T><T>, Cxc:Cxc.ID))<BR>      Asigna(Info.Ruta, SQL(<T>spMovRutaIntelisis :tEmpresa, :tModulo, :tMov, :nID<T>, Empresa, <T>CXC<T>,<T><T>, Cxc:Cxc.ID))<BR><BR>      SI Info.Reporte <> <T><T><BR>      Entonces<BR>        ReportePDF(Info.Reporte,Cxc:Cxc.ID,Info.Ruta)<BR>        //Asigna(Info.Mensaje,<T>Proceso Concluido<T>)<BR>      Fin<BR>   Fin<BR>Fin<BR>EjecutarSQL(<T>EXEC spEnviarRecepcionPago :nID,:tEmpresa, :tModulo<T>, Cxc:Cxc.ID,Empresa,<T>CXC<T>)<BR>Informacion(<T>Proceso Concluido<T>)<BR>   ActualizarForma
+ActivoCondicion=SQL(<T>SELECT COUNT(*) FROM LogEnvioMail WHERE Modulo = :tMod AND ModuloId = :nID<T>, <T>CXC<T>,Cxc:Cxc.ID)  = 0
+VisibleCondicion=(Cxc:Cxc.Mov = <T>Anticipo T<T>) y (Cxc:Cxc.Estatus = <T>PENDIENTE<T>)
+
+[Cxc.Frm/Forma]
+PosicionInicialIzquierda=0
+PosicionInicialArriba=0
+PosicionInicialAncho=1382
+PosicionInicialAlturaCliente=681
+ExpresionesAlMostrar=Asigna(Info.Mov, Nulo)<BR>Asigna(Info.MovID, Nulo)<BR>Asigna(Info.Importe, 0.0)<BR>Asigna(Def.CxImpuesto, General.DefImpuesto)<BR>Asigna(Info.CteFam,Usuario.GrupoTrabajo)<BR>Asigna(Ver.Expresion,SQL(<T>EXEC spMovSPDFCXC<T>))<BR>Reexpresa(Ver.Expresion)
+ExpresionesAlCerrar=Asigna(Filtro.Cliente, Nulo)<BR>Asigna(Filtro.Mov, Nulo)<BR>Asigna(Filtro.Proyecto, Nulo)<BR>Asigna(Filtro.Actividad, Nulo)<BR>Asigna(Info.CteFam,Usuario.GrupoTrabajo)
+VentanaEstadoInicial=Normal
+VentanaColor=Plata
+ExpresionesAlActivar=Asigna(Info.CteFam,Usuario.GrupoTrabajo)<BR>Asigna(Ver.Expresion,SQL(<T>EXEC spMovSPDFCXC<T>))<BR>Reexpresa(Ver.Expresion)
+
+[Cxc.Frm/(Carpeta Abrir)]
+FiltroGeneral=ISNULL( Cte.Familia,<T>{Info.CteFam}<T>) = CASE WHEN <T>{Info.CteFam}<T> IN(<T>DIRECCION COMERCIAL<T>,<T>INTELESIS<T>,<T>AUDITORIA<T>) THEN ISNULL( Cte.Familia,<T>{Info.CteFam}<T>) ELSE <T>{Info.CteFam}<T>  END
+
+[Cxc.Frm/Ficha.ListaEnCaptura]
+Cxc.Referencia=Cxc.PorcentajeSI
+Cxc.PorcentajeSI=Cxc.Parcial
+Cxc.Parcial=Cxc.Temporada
+Cxc.Temporada=Cxc.DescTempo
+Cxc.DescTempo=Cxc.Condicion
+
+[Cxc.Frm/Ficha.Cxc.PorcentajeSI]
+Carpeta=Ficha
+Clave=Cxc.PorcentajeSI
+Editar=S
+LineaNueva=N
+ValidaNombre=S
+3D=S
+ColorFondo=Blanco
+Tamano=20
+
+[Cxc.Frm/Ficha.Cxc.Parcial]
+Carpeta=Ficha
+Clave=Cxc.Parcial
+Editar=S
+LineaNueva=N
+ValidaNombre=N
+3D=S
+ColorFondo=Blanco
+Tamano=20
+EditarConBloqueo=S
+
+[Cxc.Frm/Acciones.CFDIRegenerarPDF]
+Antes=S
+AntesExpresiones=Asigna(Info.Id,Cxc:Cxc.ID)
+
+[Cxc.Frm/Ficha.Cxc.Condicion]
+LineaNueva=S
+
+[Cxc.Frm/Acciones.Eliminar]
+Antes=S
+AntesExpresiones=EjecutarSQL(<T>EXEC spUpdateExploraDPP :nid, :tempresa<T>, Cxc:Cxc.ID, Empresa)
+
+[Cxc.Frm/Ficha.Cxc.Temporada]
+Carpeta=Ficha
+Clave=Cxc.Temporada
+Editar=S
+LineaNueva=S
+ValidaNombre=S
+3D=S
+Tamano=20
+ColorFondo=Blanco
+
+[Cxc.Frm/Ficha.Cxc.DescTempo]
+Carpeta=Ficha
+Clave=Cxc.DescTempo
+Editar=S
+3D=S
+Pegado=S
+Tamano=30
+ColorFondo=Blanco
+
+[Cxc.Frm/Acciones.Otros5]
+Menu=&Edición
+TipoAccion=Formas
+Boton=0
+NombreDesplegar=Pedidos Venta
+GuardarAntes=S
+ClaveAccion=MovPedidoCxC
+Antes=S
+Visible=S
+ActivoCondicion=Cxc:Cxc.Estatus = <T>SINAFECTAR<T> o (Cxc:Cxc.Estatus = <T>PENDIENTE<T> y (Usuario en (<T>ERAMIREZ<T>, <T>SNOLASCO<T>, <T>ABERNAL1<T>, <T>JQUEZADA<T>, <T>LCHAVEZ<T>, <T>JCHAVEZ2<T>, <T>ALOPEZ3<T>)))
+AntesExpresiones=Asigna(Info.ID, Cxc:Cxc.ID)
+
+[Cxc.frm/Acciones.Anexos]
+AntesExpresiones=Asigna(Info.Rama, <T>CXC<T>)<BR>Asigna(Info.Fecha, Cxc:Cxc.FechaEmision)<BR>Asigna(Info.ID, Cxc:Cxc.ID)<BR>Asigna(Info.AnexoCfg, (no FormaBloqueada) y (Usuario.ModificarAnexosMovConcluidos o (Cxc:Cxc.Estatus noen (EstatusCancelado, EstatusConcluido))))<BR>Asigna(Info.Descripcion, Cxc:Cxc.Mov+<T> <T>+Cxc:Cxc.MovID)<BR>Asigna(Ver.Expresion,SQL(<T>EXEC spMovSPDFCXC<T>))<BR>Reexpresa(Ver.Expresion)
+
+[Cxc.frm/Acciones.Afectar]
+Menu=
+UsaTeclaRapida=
+TeclaRapida=
+EnBarraHerramientas=
+EnMenu=
+EspacioPrevio=
+BarraBtnFuente=
+BarraBtnTxtAlign=
+BarraBtnTxtPos=
+BarraBtnSubtitFuente=
+BarraBtnDescripFuente=
+BarraBtnImgPos=
+BarraBtnImgAlign=
+BarraBtnSubtituloAli=
+BarraBtnDescripcionAli=
+BarraBtnSubtituloPos=
+BarraBtnDescripcionPos=
+AccionSecTextoFuente=
+AccionSecAli=
+
+[Cxc.frm/Acciones.Afectar2.Afectar]
+Nombre=Afectar
+Boton=0
+TipoAccion=Expresion
+Expresion=Asigna(Ver.Expresion,SQL(<T>EXEC spMovSPDFCXC<T>))<BR>Reexpresa(Ver.Expresion)<BR>Forma.Accion(<T>Afectar<T>)
+Activo=S
+Visible=S
+
+[Cxc.frm/Acciones.Afectar2]
+Nombre=Afectar2
+Boton=7
+Menu=&Archivo
+UsaTeclaRapida=S
+TeclaRapida=F12
+NombreDesplegar=<T>A&fectar<T>
+GuardarAntes=S
+RefrescarDespues=S
+Multiple=S
+EnBarraHerramientas=S
+EnMenu=S
+EspacioPrevio=S
+TipoAccion=Expresion
+ListaAccionesMultiples=Afectar
+ConCondicion=S
+Antes=S
+Visible=S
+ActivoCondicion=PuedeAfectar(Usuario.Afectar, Usuario.AfectarOtrosMovs, Cxc:Cxc.Usuario) y<BR>((Cxc:Cxc.Estatus en (EstatusSinAfectar, EstatusPorConfirmar, EstatusBorrador)) o ((Cxc:Cxc.Estatus=EstatusPendiente) y MovTipoEn(<T>CXC<T>, Cxc:Cxc.Mov, (CXC.F, CXC.FA, CXC.AF, CXC.CA, CXC.CAD, CXC.CAP, CXC.VV, CXC.OV, CXC.IM, CXC.RM, CXC.D, CXC.DM, CXC.DP, CXC.CD, CXC.A, CXC.AR, CXC.DA, CXC.NC, CXC.NCD, CXC.NCF, CXC.DV, CXC.NCP, CXC.FAC, CXC.DAC))))  y<BR>fnPuedeAvanzarEstatus(Empresa, <T>CXC<T>, Cxc:Cxc.Mov, Cxc:Cxc.Estatus, FormaSituacion, Usuario)
+EjecucionCondicion=ConDatos(Cxc:Cxc.Mov)
+AntesExpresiones=Si<BR>  General.CamposExtras=<T>Campos Extras<T> y (Cxc:Cxc.Estatus en (EstatusSinAfectar, EstatusPorConfirmar, EstatusBorrador)) y SQL(<T>SELECT CEAntesAfectar FROM MovTipo WHERE Modulo=:tModulo AND Mov=:tMov AND CE=1<T>, <T>CXC<T>, Cxc:Cxc.Mov)<BR>Entonces<BR>  Si(no CamposExtrasMovimiento(<T>CXC<T>, Cxc:Cxc.Mov, Cxc:Cxc.ID, Verdadero, Cxc:Cxc.Estatus noen (EstatusSinAfectar, EstatusPorConfirmar, EstatusBorrador)), AbortarOperacion)<BR>FIn
+
